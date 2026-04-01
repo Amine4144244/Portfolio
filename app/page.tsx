@@ -1,388 +1,434 @@
-"use client"
+﻿"use client"
 
-import { useState, useEffect } from "react"
-import { Menu, X, Moon, Sun, Github, Linkedin, Mail } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect, useRef } from "react"
+import { 
+  Files, 
+  Search, 
+  GitBranch, 
+  Settings, 
+  ChevronRight, 
+  ChevronDown, 
+  Folder, 
+  FileCode, 
+  Terminal, 
+  Github, 
+  Linkedin, 
+  Mail, 
+  ExternalLink,
+  Menu,
+  X,
+  XCircle,
+  AlertTriangle,
+  RadioTower,
+  Layout
+} from "lucide-react"
 
 export default function Portfolio() {
-  const [isDark, setIsDark] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("hero")
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isAppFolderOpen, setIsAppFolderOpen] = useState(true)
+  const [time, setTime] = useState("")
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const isDarkMode = document.documentElement.classList.contains("dark")
-    setIsDark(isDarkMode)
-  }, [])
+    // Force dark mode to stay true to VS Code Dark+ theme
+    document.documentElement.classList.add("dark")
 
-  const toggleDarkMode = () => {
-    const html = document.documentElement
-    html.classList.toggle("dark")
-    setIsDark(!isDark)
-    localStorage.setItem("darkMode", String(!isDark))
-  }
+    const updateTime = () => {
+      const now = new Date()
+      setTime(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }))
+    }
+    updateTime()
+    const timer = setInterval(updateTime, 60000)
+
+    const handleScroll = () => {
+      if (!scrollContainerRef.current) return
+      
+      const scrollY = scrollContainerRef.current.scrollTop
+      const sections = ["hero", "about", "projects", "skills", "contact"]
+      
+      for (const section of [...sections].reverse()) {
+        const element = document.getElementById(section)
+        if (element && scrollY >= element.offsetTop - 300) {
+          setActiveSection(section)
+          break
+        }
+      }
+    }
+
+    const scrollContainer = scrollContainerRef.current
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll)
+    }
+
+    return () => {
+      clearInterval(timer)
+      if (scrollContainer) {
+        scrollContainer.removeEventListener("scroll", handleScroll)
+      }
+    }
+  }, [])
 
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId)
     setIsMobileMenuOpen(false)
     const element = document.getElementById(sectionId)
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" })
+    if (element && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: element.offsetTop - 50,
+        behavior: "smooth"
+      })
     }
   }
 
-  return (
-    <div className={isDark ? "dark" : ""}>
-      <main className="min-h-screen bg-background text-foreground">
-        {/* Navigation */}
-        <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  AL
-                </h1>
-              </div>
+  const files = [
+    { id: "hero", name: "page.tsx", icon: <FileCode size={16} className="text-[#519aba]" /> },
+    { id: "about", name: "about.md", icon: <Layout size={16} className="text-[#4ec9b0]" /> },
+    { id: "projects", name: "projects.json", icon: <FileCode size={16} className="text-[#cbcb41]" /> },
+    { id: "skills", name: "skills.ts", icon: <FileCode size={16} className="text-[#519aba]" /> },
+    { id: "contact", name: ".env", icon: <Terminal size={16} className="text-[#a0a0a0]" /> },
+  ]
 
-              {/* Desktop Menu */}
-              <div className="hidden md:flex items-center gap-8">
-                {["hero", "about", "projects", "skills", "contact"].map((item) => (
+  return (
+    <div className="flex flex-col h-screen w-full bg-[#1e1e1e] text-[#cccccc] font-sans overflow-hidden">
+      
+      {/* Top Title Bar (Mobile Menu Toggle) */}
+      <div className="md:hidden flex items-center justify-between bg-[#323233] px-4 py-2 border-b border-[#1e1e1e]">
+        <div className="flex items-center gap-2">
+          <FileCode size={18} className="text-[#519aba]" />
+          <span className="text-sm font-medium">Amine Labibi - VS Code</span>
+        </div>
+        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-400 hover:text-white">
+          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
+
+      <div className="flex-1 flex overflow-hidden">
+        
+        {/* Activity Bar */}
+        <div className="hidden md:flex w-12 bg-[#333333] flex-col items-center py-4 gap-6 shrink-0">
+          <div className="relative group cursor-pointer">
+            <div className="absolute left-[-16px] top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r"></div>
+            <Files className="text-white" size={24} />
+          </div>
+          <Search className="text-[#858585] hover:text-white cursor-pointer transition-colors" size={24} />
+          <GitBranch className="text-[#858585] hover:text-white cursor-pointer transition-colors" size={24} />
+          <div className="flex-1"></div>
+          <Settings className="text-[#858585] hover:text-white cursor-pointer transition-colors mb-2" size={24} />
+        </div>
+
+        {/* Sidebar Explorer */}
+        <div className={`
+          absolute md:static z-40 bg-[#252526] w-64 h-full border-r border-[#1e1e1e] transition-transform duration-300
+          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+          flex flex-col
+        `}>
+          <div className="h-10 flex items-center px-4 text-[11px] font-semibold tracking-wider text-gray-400">
+            EXPLORER
+          </div>
+          <div className="flex items-center gap-1 px-2 py-1 cursor-pointer bg-[#37373d] text-white">
+            <ChevronDown size={16} /> 
+            <span className="text-xs font-bold font-mono">PORTFOLIO</span>
+          </div>
+          <div className="flex-1 overflow-y-auto py-2">
+            <div 
+              className="flex items-center gap-1 px-4 py-1 cursor-pointer hover:bg-[#2a2d2e] select-none"
+              onClick={() => setIsAppFolderOpen(!isAppFolderOpen)}
+            >
+              {isAppFolderOpen ? (
+                <ChevronDown size={14} className="text-[#cccccc]" />
+              ) : (
+                <ChevronRight size={14} className="text-[#cccccc]" />
+              )}
+              <Folder size={16} className="text-[#dcb67a]" />
+              <span className="text-sm">app</span>
+            </div>
+            {isAppFolderOpen && (
+              <div className="pl-8 flex flex-col font-mono text-sm space-y-[2px]">
+                {files.map((file) => (
                   <button
-                    key={item}
-                    onClick={() => scrollToSection(item)}
-                    className={`text-sm font-medium transition-colors ${
-                      activeSection === item ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                    key={file.id}
+                    onClick={() => scrollToSection(file.id)}
+                    className={`flex items-center gap-2 px-2 py-1 w-full text-left transition-colors ${
+                      activeSection === file.id 
+                        ? "bg-[#37373d] text-white" 
+                        : "text-[#cccccc] hover:bg-[#2a2d2e]"
                     }`}
                   >
-                    {item.charAt(0).toUpperCase() + item.slice(1)}
-                  </button>
-                ))}
-              </div>
-
-              {/* Theme Toggle & Mobile Menu */}
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={toggleDarkMode}
-                  className="p-2 rounded-lg hover:bg-muted transition-colors"
-                  aria-label="Toggle dark mode"
-                >
-                  {isDark ? <Sun size={20} /> : <Moon size={20} />}
-                </button>
-
-                <button
-                  className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  aria-label="Toggle menu"
-                >
-                  {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                </button>
-              </div>
-            </div>
-
-            {/* Mobile Menu */}
-            {isMobileMenuOpen && (
-              <div className="md:hidden pb-4 space-y-2">
-                {["hero", "about", "projects", "skills", "contact"].map((item) => (
-                  <button
-                    key={item}
-                    onClick={() => scrollToSection(item)}
-                    className="block w-full text-left px-4 py-2 rounded-lg hover:bg-muted transition-colors"
-                  >
-                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                    {file.icon}
+                    {file.name}
                   </button>
                 ))}
               </div>
             )}
           </div>
-        </nav>
+        </div>
 
-        {/* Hero Section */}
-        <section id="hero" className="min-h-screen flex items-center justify-center px-4">
-          <div className="max-w-6xl mx-auto w-full">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <p className="text-primary font-mono text-sm">Hello, my name is</p>
-                  <h1 className="text-5xl md:text-7xl font-bold text-balance">Amine Labibi</h1>
-                  <h2 className="text-3xl md:text-5xl font-bold text-muted-foreground text-balance">
-                    Full-Stack Developer & AI Agent Builder
-                  </h2>
-                </div>
-                <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-                  I build powerful, real-world web apps and AI agents. I focus on building clean, maintainable code and
-                  shipping working systems that solve problems.
-                </p>
-                <div className="flex gap-4 pt-4">
-                  <Button onClick={() => scrollToSection("projects")} size="lg">
-                    View My Work
-                  </Button>
-                  <Button onClick={() => scrollToSection("contact")} variant="outline" size="lg">
-                    Get In Touch
-                  </Button>
-                </div>
-                <div className="flex gap-4 pt-4">
-                  <a
-                    href="https://github.com/Amine4144244"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <Github size={24} />
-                  </a>
-                  <a
-                    href="https://www.linkedin.com/in/amine-labibi-a4b820242/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <Linkedin size={24} />
-                  </a>
-                  <a
-                    href="mailto:amineib135@gmail.com"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <Mail size={24} />
-                  </a>
-                </div>
-              </div>
-              <div className="hidden md:flex justify-center">
-                <div className="relative w-64 h-64 md:w-80 md:h-80">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-2xl blur-2xl opacity-20"></div>
-                  <img
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/amine-profile-xsQJ25GLHOtRPBhcQAPjb710YxDCam.jpg"
-                    alt="Amine Labibi"
-                    className="relative w-full h-full object-cover rounded-2xl border-2 border-primary/20"
-                  />
-                </div>
-              </div>
-            </div>
+        {/* Main Editor Area */}
+        <div className="flex-1 flex flex-col min-w-0 bg-[#1e1e1e] z-10 relative">
+          
+          {/* Tabs */}
+          <div className="hidden md:flex bg-[#2d2d2d] h-11 overflow-x-auto no-scrollbar shrink-0">
+            {files.map((file) => (
+              <button
+                key={file.id}
+                onClick={() => scrollToSection(file.id)}
+                className={`flex items-center gap-2 px-4 py-2 min-w-[120px] max-w-[200px] text-sm font-mono transition-colors border-r border-[#1e1e1e] ${
+                  activeSection === file.id 
+                    ? "bg-[#1e1e1e] border-t-[3px] border-t-[#007acc] text-white" 
+                    : "bg-[#2d2d2d] border-t-[3px] border-t-transparent text-[#8b949e] hover:bg-[#2b2b2b]"
+                }`}
+              >
+                {file.icon}
+                <span className="truncate">{file.name}</span>
+                {activeSection === file.id && <X size={14} className="ml-auto text-gray-400 hover:text-white" />}
+              </button>
+            ))}
           </div>
-        </section>
 
-        {/* About Section */}
-        <section id="about" className="min-h-screen flex items-center py-20 px-4">
-          <div className="max-w-4xl mx-auto w-full">
-            <h2 className="text-4xl md:text-5xl font-bold mb-12">About Me</h2>
-            <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
-              <p>
-                I'm a passionate full-stack developer and AI agent builder based in Morocco. With expertise spanning
-                React, Node.js, Python, and modern AI technologies, I specialize in creating solutions that bridge the
-                gap between complex problems and elegant implementations.
-              </p>
-              <p>
-                My journey in tech has been driven by a desire to build systems that matter. Whether it's crafting
-                intuitive user interfaces or architecting robust backend systems, I approach every project with the same
-                philosophy: clean code, maintainable architecture, and real-world impact.
-              </p>
-              <p>
-                I'm currently open to freelance work and collaboration opportunities. I'm particularly interested in
-                projects involving AI integration, full-stack development, and building products that solve meaningful
-                problems.
-              </p>
-              <div className="pt-4">
-                <p className="text-muted-foreground">
-                  <span className="font-semibold text-foreground">Location:</span> Morocco
-                </p>
-                <p className="text-muted-foreground">
-                  <span className="font-semibold text-foreground">Email:</span> amineib135@gmail.com
+          {/* Breadcrumb */}
+          <div className="hidden md:flex items-center gap-1 px-4 h-8 bg-[#1e1e1e] shadow-[0_1px_2px_rgba(0,0,0,0.2)] text-[13px] text-[#cccccc] font-sans">
+            <span className="text-[#519aba]">my-app</span>
+            <ChevronRight size={14} className="text-[#656565]" />
+            <span className="text-[#519aba]">app</span>
+            <ChevronRight size={14} className="text-[#656565]" />
+            <span>{files.find(f => f.id === activeSection)?.name || "page.tsx"}</span>
+          </div>
+
+          {/* Scrollable Content (The "Code") */}
+          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-6 md:px-16 lg:px-32 scroll-smooth pb-32">
+            
+            {/* Top Spacing */}
+            <div className="h-16 md:h-12 w-full"></div>
+
+            {/* Line numbers background effect (optional visual touch) */}
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-[#1e1e1e] border-r border-[#404040] hidden lg:block -z-10"></div>
+
+            {/* -- 1. HERO -- */}
+            <section id="hero" className="min-h-[85vh] flex flex-col justify-center relative font-mono text-base md:text-lg">
+              <div className="text-[#6a9955] mb-8 select-none">
+                <p>{"/**"}</p>
+                <p className="pl-4">{"* hello world !! Welcome to my portfolio"}</p>
+                <p className="pl-4">{"* Amine Labibi - 2026"}</p>
+                <p>{"*/"}</p>
+              </div>
+
+              <div className="space-y-4">
+                <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
+                  <span className="text-[#dcdcaa]">Amine</span>
+                  <span className="text-[#ce9178]">Labibi</span>
+                </h1>
+                
+                <h2 className="text-2xl md:text-4xl text-[#4ec9b0] font-sans">
+                  Full-Stack Developer <span className="text-[#858585]">|</span> AI Agent Builder
+                </h2>
+
+                <p className="text-[#9cdcfe] mt-6 max-w-2xl text-lg font-sans leading-relaxed">
+                  I build powerful, real-world web apps and AI agents. I focus on building clean, maintainable code and shipping working systems that solve problems.
                 </p>
               </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Projects Section */}
-        <section id="projects" className="min-h-screen flex items-center py-20 px-4">
-          <div className="max-w-4xl mx-auto w-full">
-            <h2 className="text-4xl md:text-5xl font-bold mb-12">Featured Projects</h2>
-            <div className="space-y-8">
-              {[
-                {
-                  title: "AI Extractor",
-                  description:
-                    "A full-stack app that extracts structured data from PDFs and ID documents using OCR and LLM pipelines. Combines advanced computer vision with language models for accurate data extraction.",
-                  tech: ["React", "Node.js", "LangChain", "MongoDB", "OCR"],
-                },
-                {
-                  title: "AI-Blog",
-                  description:
-                    "A full-stack blogging platform powered by AI to help users generate, edit, and publish intelligent content. Features real-time collaboration and AI-assisted writing.",
-                  tech: ["React", "Node.js", "Express", "MongoDB", "OpenAI API"],
-                },
-                {
-                  title: "AI-Journal",
-                  description:
-                    "A personal journaling app that uses AI to summarize, analyze, and reflect on user entries. Provides insights and patterns from your thoughts and experiences.",
-                  tech: ["React", "Node.js", "PostgreSQL", "LangChain"],
-                },
-              ].map((project, index) => (
-                <div
-                  key={index}
-                  className="group bg-card border border-border rounded-lg p-6 md:p-8 hover:border-primary/50 transition-all hover:shadow-lg"
-                >
-                  <h3 className="text-2xl font-bold mb-3 group-hover:text-primary transition-colors">
-                    {project.title}
-                  </h3>
-                  <p className="text-muted-foreground mb-4 leading-relaxed">{project.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {project.tech.map((tech) => (
-                      <span
-                        key={tech}
-                        className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium"
-                      >
-                        {tech}
-                      </span>
-                    ))}
+              {/* Action Stats / Links */}
+              <div className="flex flex-wrap gap-4 mt-10 font-sans text-sm font-semibold tracking-wider">
+                <div className="flex items-center gap-2 px-4 py-2 bg-[#2d2d2d] rounded border border-[#404040] hover:border-[#007acc] transition-colors cursor-pointer text-[#d4d4d4]" onClick={() => scrollToSection('projects')}>
+                  <Folder size={16} className="text-[#dcb67a]" /> Projects
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 bg-[#2d2d2d] rounded border border-[#404040] hover:border-[#007acc] transition-colors cursor-pointer text-[#d4d4d4]" onClick={() => scrollToSection('about')}>
+                   <span></span> About Me
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 bg-[#007acc] text-white rounded border border-[#007acc] hover:bg-[#005f9e] transition-colors cursor-pointer" onClick={() => scrollToSection('contact')}>
+                   <Mail size={16} /> Contact
+                </div>
+              </div>
+
+              {/* Tag / Stats row */}
+              <div className="flex flex-wrap gap-4 mt-12 pt-8 border-t border-[#333333] text-xs font-mono text-[#858585]">
+                 <span className="flex items-center gap-1 text-[#b5cea8]"><RadioTower size={14}/> 3+ YEARS</span>
+                 <span className="flex items-center gap-1 text-[#b5cea8]"><Folder size={14}/> 10+ PROJECTS</span>
+                 <span className="flex items-center gap-1 text-[#c586c0]"> CURIOSITY</span>
+                 <span className="flex items-center gap-1 text-[#c586c0]"> ALWAYS LEARNING</span>
+              </div>
+            </section>
+
+            {/* -- 2. ABOUT -- */}
+            <section id="about" className="min-h-[70vh] py-20 font-sans">
+              <h3 className="text-3xl font-bold text-[#d4d4d4] font-mono mb-8 flex items-center gap-3">
+                <span className="text-[#569cd6]">export const</span> <span className="text-[#dcdcaa]">AboutMe</span> = () <span className="text-[#569cd6]">{"=> {"}</span>
+              </h3>
+              
+              <div className="pl-4 md:pl-8 border-l-2 border-[#404040] space-y-6 text-lg text-[#cccccc] leading-relaxed relative">
+                <p>
+                  I'm a passionate full-stack developer and AI agent builder based in <span className="text-[#ce9178] font-mono">"Morocco"</span>. With expertise spanning React, Node.js, Python, and modern AI technologies, I specialize in creating solutions that bridge the gap between complex problems and elegant implementations.
+                </p>
+                <p>
+                  My journey in tech has been driven by a desire to build systems that matter. Whether it's crafting intuitive user interfaces or architecting robust backend systems, I approach every project with the same philosophy: run <span className="text-[#4ec9b0] font-mono">clean_code.sh</span>, maintain scalable architecture, and deliver real-world impact.
+                </p>
+                <div className="flex gap-6 mt-8 pt-4">
+                  <a href="https://github.com/Amine4144244" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#007acc] transition-colors">
+                    <Github size={20} /> <span className="font-mono text-sm">GitHub</span>
+                  </a>
+                  <a href="https://www.linkedin.com/in/amine-labibi-a4b820242/" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#007acc] transition-colors">
+                    <Linkedin size={20} /> <span className="font-mono text-sm">LinkedIn</span>
+                  </a>
+                </div>
+              </div>
+              <h3 className="text-3xl font-bold text-[#569cd6] font-mono mt-8">{"}"}</h3>
+            </section>
+
+            {/* -- 3. PROJECTS -- */}
+            <section id="projects" className="min-h-[80vh] py-20">
+              <div className="text-[#6a9955] mb-6 font-mono">{'// Featured Deployments'}</div>
+              <h3 className="text-3xl font-bold text-[#d4d4d4] font-mono mb-12 flex items-center gap-3">
+                <span className="text-[#569cd6]">const</span> <span className="text-[#4fc1ff]">projects</span> = <span className="text-[#d4d4d4]">{"["}</span>
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-6 pl-4 md:pl-8 relative z-10">
+                <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#404040] -z-10"></div>
+                {[
+                  {
+                    title: "AI Extractor",
+                    description: "Full-stack app extracting structured data from PDFs/IDs using OCR & LLM pipelines.",
+                    tech: ["React", "Node.js", "LangChain", "MongoDB"]
+                  },
+                  {
+                    title: "AI-Blog",
+                    description: "Blogging platform powered by AI. Real-time collaboration and AI-assisted writing.",
+                    tech: ["React", "Express", "OpenAI API", "MongoDB"]
+                  },
+                  {
+                    title: "AI-Journal",
+                    description: "Personal journaling app that uses AI to summarize and reflect on user entries.",
+                    tech: ["Next.js", "PostgreSQL", "LangChain"]
+                  }
+                ].map((project, idx) => (
+                  <div key={idx} className="bg-[#252526] border border-[#333333] hover:border-[#007acc] transition-colors p-6 rounded relative group shadow-lg">
+                    <div className="flex justify-between items-start mb-4">
+                      <Folder size={28} className="text-[#dcb67a]" />
+                      <a href="#" className="opacity-0 group-hover:opacity-100 transition-opacity text-[#cccccc] hover:text-[#007acc]">
+                        <ExternalLink size={20} />
+                      </a>
+                    </div>
+                    <h4 className="text-xl font-bold font-sans text-white mb-2">{project.title}</h4>
+                    <p className="text-sm text-[#cccccc] mb-6 leading-relaxed bg-[#1e1e1e] p-3 rounded font-mono border border-[#333333]">
+                      <span className="text-[#ce9178]">"{project.description}"</span>
+                    </p>
+                    <div className="flex flex-wrap gap-2 text-xs font-mono text-[#4ec9b0]">
+                      {project.tech.map(t => <span key={t}>{t}</span>)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <h3 className="text-3xl font-bold text-[#d4d4d4] font-mono mt-8">{" ]"}</h3>
+            </section>
+
+            {/* -- 4. SKILLS -- */}
+            <section id="skills" className="min-h-[60vh] py-20">
+              <div className="text-[#6a9955] mb-6 font-mono">{'// Tech Stack configuration'}</div>
+              <div className="bg-[#1e1e1e] rounded font-mono text-sm md:text-base text-[#d4d4d4]">
+                <div><span className="text-[#c586c0]">interface</span> <span className="text-[#4ec9b0]">Skills</span> {"{"}</div>
+                <div className="pl-8 space-y-2 py-4">
+                  <div>
+                    <span className="text-[#9cdcfe]">frontend</span>: <span className="text-[#569cd6]">string[]</span>;
+                    <div className="pl-4 text-[#ce9178] opacity-80">
+                      // ['React', 'Next.js', 'TypeScript', 'Tailwind', 'HTML/CSS']
+                    </div>
+                  </div>
+                  <div className="pt-2">
+                    <span className="text-[#9cdcfe]">backend</span>: <span className="text-[#569cd6]">string[]</span>;
+                    <div className="pl-4 text-[#ce9178] opacity-80">
+                      // ['Node.js', 'Express', 'PostgreSQL', 'MongoDB']
+                    </div>
+                  </div>
+                  <div className="pt-2">
+                    <span className="text-[#9cdcfe]">ai&tools</span>: <span className="text-[#569cd6]">string[]</span>;
+                    <div className="pl-4 text-[#ce9178] opacity-80">
+                      // ['Python', 'LangChain', 'LangGraph', 'Agentic AI', 'OpenAI', 'Docker', 'Git']
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
+                <div>{"}"}</div>
+              </div>
+            </section>
 
-        {/* Skills Section */}
-        <section id="skills" className="min-h-screen flex items-center py-20 px-4">
-          <div className="max-w-4xl mx-auto w-full">
-            <h2 className="text-4xl md:text-5xl font-bold mb-12">Skills & Technologies</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                {
-                  category: "Frontend",
-                  skills: ["React", "TypeScript", "Tailwind CSS", "Next.js", "HTML/CSS"],
-                },
-                {
-                  category: "Backend",
-                  skills: ["Node.js", "Express", "Python", "PostgreSQL", "MongoDB"],
-                },
-                {
-                  category: "AI & Tools",
-                  skills: ["LangChain", "AI Agents", "Docker", "Git", "REST APIs"],
-                },
-              ].map((skillGroup) => (
-                <div
-                  key={skillGroup.category}
-                  className="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-all"
-                >
-                  <h3 className="text-xl font-bold mb-4 text-primary">{skillGroup.category}</h3>
-                  <ul className="space-y-2">
-                    {skillGroup.skills.map((skill) => (
-                      <li key={skill} className="text-muted-foreground">
-                        ✓ {skill}
-                      </li>
-                    ))}
-                  </ul>
+            {/* -- 5. CONTACT -- */}
+            <section id="contact" className="min-h-[70vh] py-20 relative">
+              <div className="text-[#6a9955] mb-6 font-mono">{'// init_connection.sh'}</div>
+              <h2 className="text-4xl font-bold mb-8 text-[#d4d4d4]">Open Connection</h2>
+              <p className="text-[#cccccc] mb-8 font-sans max-w-xl text-lg">
+                I'm currently looking for new opportunities. Whether it's a project idea or just saying hi, my inbox is open.
+              </p>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  const formData = new FormData(e.currentTarget)
+                  const email = "amineib135@gmail.com"
+                  const subject = `New connection from ${formData.get("name")}`
+                  const body = `Name: ${formData.get("name")}\nEmail: ${formData.get("email")}\n\nMessage:\n${formData.get("message")}`
+                  window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+                }}
+                className="max-w-md bg-[#252526] border border-[#333333] p-6 rounded shadow-lg font-mono space-y-4"
+              >
+                <div>
+                  <label className="block text-xs text-[#858585] mb-1">name_variable</label>
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    className="w-full bg-[#3c3c3c] border border-transparent focus:border-[#007acc] focus:outline-none text-white px-3 py-2 text-sm rounded shadow-inner"
+                    placeholder="Enter name..."
+                  />
                 </div>
-              ))}
-            </div>
+                <div>
+                  <label className="block text-xs text-[#858585] mb-1">email_string</label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    className="w-full bg-[#3c3c3c] border border-transparent focus:border-[#007acc] focus:outline-none text-white px-3 py-2 text-sm rounded shadow-inner"
+                    placeholder="Enter email..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-[#858585] mb-1">body_payload</label>
+                  <textarea
+                    name="message"
+                    required
+                    rows={4}
+                    className="w-full bg-[#3c3c3c] border border-transparent focus:border-[#007acc] focus:outline-none text-white px-3 py-2 text-sm rounded shadow-inner resize-none"
+                    placeholder="Enter message..."
+                  ></textarea>
+                </div>
+                <button type="submit" className="w-full bg-[#0e639c] hover:bg-[#1177bb] transition-colors text-white font-sans font-medium py-2 rounded shadow">
+                  execute send()
+                </button>
+              </form>
+            </section>
+
           </div>
-        </section>
+        </div>
+      </div>
 
-        {/* Contact Section */}
-        <section id="contact" className="min-h-screen flex items-center py-20 px-4">
-          <div className="max-w-2xl mx-auto w-full">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">Get In Touch</h2>
-            <p className="text-lg text-muted-foreground text-center mb-12">
-              I'd love to hear about your project. Feel free to reach out for collaboration, freelance opportunities, or
-              just a friendly chat.
-            </p>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                const formData = new FormData(e.currentTarget)
-                const email = "amineib135@gmail.com"
-                const subject = `New message from ${formData.get("name")}`
-                const body = `Name: ${formData.get("name")}\nEmail: ${formData.get("email")}\n\nMessage:\n${formData.get("message")}`
-                window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-              }}
-              className="space-y-6"
-            >
-              <div className="space-y-2">
-                <label htmlFor="name" className="block font-medium">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  className="w-full px-4 py-2 rounded-lg bg-input border border-border focus:border-primary focus:outline-none transition-colors"
-                  placeholder="Your name"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="email" className="block font-medium">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  className="w-full px-4 py-2 rounded-lg bg-input border border-border focus:border-primary focus:outline-none transition-colors"
-                  placeholder="your@email.com"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="message" className="block font-medium">
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  rows={5}
-                  className="w-full px-4 py-2 rounded-lg bg-input border border-border focus:border-primary focus:outline-none transition-colors resize-none"
-                  placeholder="Your message..."
-                ></textarea>
-              </div>
-
-              <Button type="submit" size="lg" className="w-full">
-                Send Message
-              </Button>
-            </form>
-
-            <div className="mt-12 border-t border-border pt-12">
-              <div className="flex justify-center gap-6">
-                <a
-                  href="https://github.com/Amine4144244"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <Github size={20} />
-                  <span>GitHub</span>
-                </a>
-                <a
-                  href="https://www.linkedin.com/in/amine-labibi-a4b820242/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <Linkedin size={20} />
-                  <span>LinkedIn</span>
-                </a>
-                <a
-                  href="mailto:amineib135@gmail.com"
-                  className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <Mail size={20} />
-                  <span>Email</span>
-                </a>
-              </div>
-            </div>
+      {/* Editor Status Bar */}
+      <div className="h-[22px] bg-[#007acc] text-white text-xs flex items-center justify-between px-3 font-sans select-none shrink-0 z-50">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 cursor-pointer hover:bg-white/20 px-1 rounded transition-colors">
+            <GitBranch size={12} /> main*
           </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="bg-card border-t border-border py-8 px-4">
-          <div className="max-w-6xl mx-auto text-center text-muted-foreground text-sm">
-            <p>© 2025 Amine Labibi. All rights reserved.</p>
-            <p className="mt-2">Built with React, Next.js, and Tailwind CSS</p>
+          <div className="flex items-center gap-2 cursor-pointer hover:bg-white/20 px-1 rounded transition-colors hidden sm:flex">
+            <span className="flex items-center gap-1"><XCircle size={13} /> 0</span>
+            <span className="flex items-center gap-1"><AlertTriangle size={13} /> 0</span>
           </div>
-        </footer>
-      </main>
+          <div className="hidden md:block">Amine Labibi's Portfolio</div>
+        </div>
+        <div className="flex items-center gap-3 md:gap-4 font-mono">
+          <div className="hidden sm:block cursor-pointer hover:bg-white/20 px-1 rounded transition-colors">UTF-8</div>
+          <div className="cursor-pointer hover:bg-white/20 px-1 rounded transition-colors">TypeScript React</div>
+          <div className="cursor-pointer hover:bg-white/20 px-1 rounded transition-colors"> Dark+</div>
+          <div className="hidden sm:block"> {time || "14:30"}</div>
+        </div>
+      </div>
+
     </div>
   )
 }
