@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect, useRef } from "react"
 import { 
@@ -286,9 +286,9 @@ export default function Portfolio() {
                 <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#404040] -z-10"></div>
                 {[
                   {
-                    title: "AI Extractor",
-                    description: "Full-stack app extracting structured data from PDFs/IDs using OCR & LLM pipelines.",
-                    tech: ["React", "Node.js", "LangChain", "MongoDB"]
+                    title: "Agentic AI with Groq",
+                    description: "A project exploring AI agent patterns (ReAct, RAG, and multi-agent workflows) using Groq's API. Features document-based RAG with ChromaDB, tool integration, and a task planning manager for complex workflows.",
+                    tech: ["Python", "Groq", "LangChain", "ChromaDB"]
                   },
                   {
                     title: "AI-Blog",
