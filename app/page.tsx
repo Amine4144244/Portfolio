@@ -296,9 +296,9 @@ export default function Portfolio() {
                     tech: ["React", "Express", "OpenAI API", "MongoDB"]
                   },
                   {
-                    title: "AI-Journal",
-                    description: "Personal journaling app that uses AI to summarize and reflect on user entries.",
-                    tech: ["Next.js", "PostgreSQL", "LangChain"]
+                    title: "ShopAI - AI Shopping assistant",
+                    description: "An AI-powered e-commerce assistant for discovery and tailored recommendations. Features a stateless FastAPI integration with Groq's LLM, and structured JSON outputs for hallucination-free results.",
+                    tech: ["React", "Node.js", "Python", "Groq", "MongoDB"]
                   }
                 ].map((project, idx) => (
                   <div key={idx} className="bg-[#252526] border border-[#333333] hover:border-[#007acc] transition-colors p-6 rounded relative group shadow-lg">
