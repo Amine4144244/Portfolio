@@ -1,19 +1,19 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { 
-  Files, 
-  Search, 
-  GitBranch, 
-  Settings, 
-  ChevronRight, 
-  ChevronDown, 
-  Folder, 
-  FileCode, 
-  Terminal, 
-  Github, 
-  Linkedin, 
-  Mail, 
+import {
+  Files,
+  Search,
+  GitBranch,
+  Settings,
+  ChevronRight,
+  ChevronDown,
+  Folder,
+  FileCode,
+  Terminal,
+  Github,
+  Linkedin,
+  Mail,
   ExternalLink,
   Menu,
   X,
@@ -43,10 +43,10 @@ export default function Portfolio() {
 
     const handleScroll = () => {
       if (!scrollContainerRef.current) return
-      
+
       const scrollY = scrollContainerRef.current.scrollTop
       const sections = ["hero", "about", "projects", "skills", "contact"]
-      
+
       for (const section of [...sections].reverse()) {
         const element = document.getElementById(section)
         if (element && scrollY >= element.offsetTop - 300) {
@@ -91,7 +91,7 @@ export default function Portfolio() {
 
   return (
     <div className="flex flex-col h-screen w-full bg-[#1e1e1e] text-[#cccccc] font-sans overflow-hidden">
-      
+
       {/* Top Title Bar (Mobile Menu Toggle) */}
       <div className="md:hidden flex items-center justify-between bg-[#323233] px-4 py-2 border-b border-[#1e1e1e]">
         <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export default function Portfolio() {
       </div>
 
       <div className="flex-1 flex overflow-hidden">
-        
+
         {/* Activity Bar */}
         <div className="hidden md:flex w-12 bg-[#333333] flex-col items-center py-4 gap-6 shrink-0">
           <div className="relative group cursor-pointer">
@@ -127,11 +127,11 @@ export default function Portfolio() {
             EXPLORER
           </div>
           <div className="flex items-center gap-1 px-2 py-1 cursor-pointer bg-[#37373d] text-white">
-            <ChevronDown size={16} /> 
+            <ChevronDown size={16} />
             <span className="text-xs font-bold font-mono">PORTFOLIO</span>
           </div>
           <div className="flex-1 overflow-y-auto py-2">
-            <div 
+            <div
               className="flex items-center gap-1 px-4 py-1 cursor-pointer hover:bg-[#2a2d2e] select-none"
               onClick={() => setIsAppFolderOpen(!isAppFolderOpen)}
             >
@@ -149,11 +149,10 @@ export default function Portfolio() {
                   <button
                     key={file.id}
                     onClick={() => scrollToSection(file.id)}
-                    className={`flex items-center gap-2 px-2 py-1 w-full text-left transition-colors ${
-                      activeSection === file.id 
-                        ? "bg-[#37373d] text-white" 
+                    className={`flex items-center gap-2 px-2 py-1 w-full text-left transition-colors ${activeSection === file.id
+                        ? "bg-[#37373d] text-white"
                         : "text-[#cccccc] hover:bg-[#2a2d2e]"
-                    }`}
+                      }`}
                   >
                     {file.icon}
                     {file.name}
@@ -166,18 +165,17 @@ export default function Portfolio() {
 
         {/* Main Editor Area */}
         <div className="flex-1 flex flex-col min-w-0 bg-[#1e1e1e] z-10 relative">
-          
+
           {/* Tabs */}
           <div className="hidden md:flex bg-[#2d2d2d] h-11 overflow-x-auto no-scrollbar shrink-0">
             {files.map((file) => (
               <button
                 key={file.id}
                 onClick={() => scrollToSection(file.id)}
-                className={`flex items-center gap-2 px-4 py-2 min-w-[120px] max-w-[200px] text-sm font-mono transition-colors border-r border-[#1e1e1e] ${
-                  activeSection === file.id 
-                    ? "bg-[#1e1e1e] border-t-[3px] border-t-[#007acc] text-white" 
+                className={`flex items-center gap-2 px-4 py-2 min-w-[120px] max-w-[200px] text-sm font-mono transition-colors border-r border-[#1e1e1e] ${activeSection === file.id
+                    ? "bg-[#1e1e1e] border-t-[3px] border-t-[#007acc] text-white"
                     : "bg-[#2d2d2d] border-t-[3px] border-t-transparent text-[#8b949e] hover:bg-[#2b2b2b]"
-                }`}
+                  }`}
               >
                 {file.icon}
                 <span className="truncate">{file.name}</span>
@@ -197,7 +195,7 @@ export default function Portfolio() {
 
           {/* Scrollable Content (The "Code") */}
           <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-6 md:px-16 lg:px-32 scroll-smooth pb-32">
-            
+
             {/* Top Spacing */}
             <div className="h-16 md:h-12 w-full"></div>
 
@@ -218,7 +216,7 @@ export default function Portfolio() {
                   <span className="text-[#dcdcaa]">Amine</span>
                   <span className="text-[#ce9178]">Labibi</span>
                 </h1>
-                
+
                 <h2 className="text-2xl md:text-4xl text-[#4ec9b0] font-sans">
                   Full-Stack Developer <span className="text-[#858585]">|</span> AI Agent Builder
                 </h2>
@@ -234,19 +232,19 @@ export default function Portfolio() {
                   <Folder size={16} className="text-[#dcb67a]" /> Projects
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 bg-[#2d2d2d] rounded border border-[#404040] hover:border-[#007acc] transition-colors cursor-pointer text-[#d4d4d4]" onClick={() => scrollToSection('about')}>
-                   <span></span> About Me
+                  <span></span> About Me
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 bg-[#007acc] text-white rounded border border-[#007acc] hover:bg-[#005f9e] transition-colors cursor-pointer" onClick={() => scrollToSection('contact')}>
-                   <Mail size={16} /> Contact
+                  <Mail size={16} /> Contact
                 </div>
               </div>
 
               {/* Tag / Stats row */}
               <div className="flex flex-wrap gap-4 mt-12 pt-8 border-t border-[#333333] text-xs font-mono text-[#858585]">
-                 <span className="flex items-center gap-1 text-[#b5cea8]"><RadioTower size={14}/> 3+ YEARS</span>
-                 <span className="flex items-center gap-1 text-[#b5cea8]"><Folder size={14}/> 10+ PROJECTS</span>
-                 <span className="flex items-center gap-1 text-[#c586c0]"> CURIOSITY</span>
-                 <span className="flex items-center gap-1 text-[#c586c0]"> ALWAYS LEARNING</span>
+                <span className="flex items-center gap-1 text-[#b5cea8]"><RadioTower size={14} /> 1 YEAR</span>
+                <span className="flex items-center gap-1 text-[#b5cea8]"><Folder size={14} /> 10+ PROJECTS</span>
+                <span className="flex items-center gap-1 text-[#c586c0]"> CURIOSITY</span>
+                <span className="flex items-center gap-1 text-[#c586c0]"> ALWAYS LEARNING</span>
               </div>
             </section>
 
@@ -255,7 +253,7 @@ export default function Portfolio() {
               <h3 className="text-3xl font-bold text-[#d4d4d4] font-mono mb-8 flex items-center gap-3">
                 <span className="text-[#569cd6]">export const</span> <span className="text-[#dcdcaa]">AboutMe</span> = () <span className="text-[#569cd6]">{"=> {"}</span>
               </h3>
-              
+
               <div className="pl-4 md:pl-8 border-l-2 border-[#404040] space-y-6 text-lg text-[#cccccc] leading-relaxed relative">
                 <p>
                   I'm a passionate full-stack developer and AI agent builder based in <span className="text-[#ce9178] font-mono">"Morocco"</span>. With expertise spanning React, Node.js, Python, and modern AI technologies, I specialize in creating solutions that bridge the gap between complex problems and elegant implementations.
@@ -296,9 +294,9 @@ export default function Portfolio() {
                     tech: ["React", "Express", "OpenAI API", "MongoDB"]
                   },
                   {
-                    title: "ShopAI - AI Shopping assistant",
-                    description: "An AI-powered e-commerce assistant for discovery and tailored recommendations. Features a stateless FastAPI integration with Groq's LLM, and structured JSON outputs for hallucination-free results.",
-                    tech: ["React", "Node.js", "Python", "Groq", "MongoDB"]
+                    title: "ShopAI - AI Powered Shopping Platform",
+                    description: "Full-stack, AI-powered e-commerce platform with an AI shopping assistant. Features product browsing, AI-driven recommendations using Groq LLM, Node.js/Express backend with MongoDB, and a Python FastAPI AI agent service.",
+                    tech: ["React", "Vite", "Tailwind", "Node.js", "Express", "MongoDB", "Python", "FastAPI", "Groq"]
                   }
                 ].map((project, idx) => (
                   <div key={idx} className="bg-[#252526] border border-[#333333] hover:border-[#007acc] transition-colors p-6 rounded relative group shadow-lg">
